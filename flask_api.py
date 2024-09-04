@@ -206,5 +206,11 @@ def get_invoice_data():
     return jsonify(invoice_data_list)
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+@app.get("/")
+def read_root():
+    return {"Hello": "Render"}
+
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
