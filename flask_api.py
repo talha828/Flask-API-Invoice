@@ -1,3 +1,6 @@
+import os
+
+import uvicorn
 from flask import Flask, request, jsonify, send_file
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
