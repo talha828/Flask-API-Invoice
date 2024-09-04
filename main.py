@@ -72,15 +72,15 @@ def create_invoice(invoice_data_list, filename):
         date = invoice_data['date']
 
         c.setFont("Helvetica-Bold", 10)
-        c.drawString(x_position, y_position, f"{client_name}")
+        c.drawString(x_position, y_position, f"{client_name} / Rs {int(total_amount)}")
 
-        c.setFont("Helvetica", 8)
-        c.drawString(x_position, y_position - 12, company_name)
+        # c.setFont("Helvetica", 8)
+        # c.drawString(x_position, y_position - 12, company_name)
 
         c.setFont("Helvetica", 7)
-        c.drawString(x_position, y_position - 24, date)
+        c.drawString(x_position, y_position - 12, f"{company_name} / {date}")
 
-        y_position -= 40
+        y_position -= 30
         c.setFont("Helvetica-Bold", 7)
         c.drawString(x_position, y_position, "Day")
         c.drawString(x_position + 50, y_position, "Milk (L)")
@@ -98,7 +98,7 @@ def create_invoice(invoice_data_list, filename):
             # Draw the values
             c.drawString(x_position, y_position, str(day))
             c.drawString(x_position + 50, y_position, f"{milk_qty:.2f}")
-            c.drawString(x_position + 100, y_position, f"{price:.2f}")
+            c.drawString(x_position + 100, y_position, f"{int(price)}")
 
             y_position -= 10
 
@@ -109,19 +109,21 @@ def create_invoice(invoice_data_list, filename):
         # Draw the final horizontal line after the last row
         c.line(x_position, y_position + 8, x_position + 150, y_position + 8)
 
+        c.setFont("Helvetica", 9)
         # Summary of totals at the bottom
-        c.drawString(x_position, y_position, "Total Milk")
-        c.drawString(x_position + 50, y_position, total_milk)
-        c.drawString(x_position + 100, y_position, f"{int(total_price)}")
+        c.drawString(x_position, y_position - 5, "Total Milk")
+        c.drawString(x_position + 50, y_position - 5, total_milk)
+        c.drawString(x_position + 100, y_position - 5, f"{int(total_price)}")
 
         y_position -= 20
-        c.drawString(x_position, y_position + 10, "Previous Balance")
-        c.drawString(x_position + 100, y_position + 10, f"{int(previous_balance)}")
+        c.drawString(x_position, y_position + 5 , "Previous Balance")
+        c.drawString(x_position + 100, y_position + 5 , f"{int(previous_balance)}")
 
         y_position -= 20
-        c.line(x_position, y_position + 28, x_position + 150, y_position + 28)
-        c.drawString(x_position, y_position + 20, "Total Balance")
-        c.drawString(x_position + 100, y_position + 20, f"{int(total_amount)}")
+        c.line(x_position, y_position + 20, x_position + 150, y_position + 20)
+        c.setFont("Helvetica-Bold", 10)
+        c.drawString(x_position, y_position + 5, "Total Balance")
+        c.drawString(x_position + 100, y_position + 5, f"{int(total_amount)}")
 
         customer_summaries.append((client_name, total_amount))
         grand_total += total_amount
