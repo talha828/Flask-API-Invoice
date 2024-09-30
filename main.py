@@ -32,6 +32,7 @@ def create_invoice_data(customer_data, company_name="Yousaf Meo", date="August -
             "total_amount": round(total_amount, 2),
             "total_milk": f"{total_milk:.2f}(L)",
             "date": date,
+            "milk_data": milk_data,
             "previous_balance": round(previous_balance, 2)
         }
 
@@ -69,6 +70,7 @@ def create_invoice(invoice_data_list, filename):
         total_price = invoice_data['total_price']
         previous_balance = invoice_data['previous_balance']
         total_milk = invoice_data['total_milk']
+        milk_data = invoice_data['milk_data']
         date = invoice_data['date']
 
         c.setFont("Helvetica-Bold", 10)
@@ -125,17 +127,17 @@ def create_invoice(invoice_data_list, filename):
         c.drawString(x_position, y_position + 5, "Total Balance")
         c.drawString(x_position + 100, y_position + 5, f"{int(total_amount)}")
 
-        customer_summaries.append((client_name, total_amount))
+        customer_summaries.append((client_name, total_amount, milk_data))
         grand_total += total_amount
 
     c.showPage()
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(30, height - 50, "Customer Summary")
+    c.drawString(30, height - 50, date)
     col_count = 0
 
     y_summary_position = height - 80
     c.setFont("Helvetica", 10)
-    for client_name, total_amount in customer_summaries:
+    for client_name, total_amount, milk_data in customer_summaries:
         if y_summary_position < 30:  # Start a new column if near the bottom
             col_count += 1
             y_summary_position = height - 80
@@ -143,15 +145,13 @@ def create_invoice(invoice_data_list, filename):
         else:
             x_position = 30 + (col_count * (width / 2))
 
-        c.drawString(x_position, y_summary_position, f"{client_name}: Rs.{int(total_amount)}")
+        c.drawString(x_position, y_summary_position, f"{client_name}: {milk_data} : {int(total_amount)}")
         y_summary_position -= 20
 
     c.setFont("Helvetica-Bold", 12)
     c.drawString(30 + (col_count * (width / 2)), y_summary_position - 100, f"Grand Total: Rs.{int(grand_total)}")
 
     c.save()
-
-# Example customer data
 
 # Example customer data
 customer = [
