@@ -87,7 +87,7 @@ def create_invoice(invoice_data_list, filename, milk_price_per_liter):
         num_days = invoice_data['num_days']  # Get number of days in the month
 
         c.setFont("Helvetica-Bold", 10)
-        c.drawString(x_position, y_position, f"{client_name}")
+        c.drawString(x_position, y_position, f"{client_name.upper()}")
 
         c.setFont("Helvetica", 7)
         c.drawString(x_position, y_position - 12, f"{company_name} / {date}")

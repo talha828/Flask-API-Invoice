@@ -74,7 +74,7 @@ def create_invoice(invoice_data_list, filename):
         date = invoice_data['date']
 
         c.setFont("Helvetica-Bold", 10)
-        c.drawString(x_position, y_position, f"{client_name} / Rs {int(total_amount)}")
+        c.drawString(x_position, y_position, f"{client_name.upper()}")
 
         # c.setFont("Helvetica", 8)
         # c.drawString(x_position, y_position - 12, company_name)
