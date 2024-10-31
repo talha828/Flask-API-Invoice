@@ -6,7 +6,6 @@ import os
 
 app = Flask(__name__)
 
-
 def parse_milk_data(milk_data):
     parsed_data = []
     for part in milk_data.strip('()').split(')('):
@@ -14,20 +13,15 @@ def parse_milk_data(milk_data):
         parsed_data.extend([quantity] * int(days))
     return parsed_data
 
-
 def create_invoice_data(customer_data, company_name="Yousaf Meo", date="August - 2024", milk_price_per_liter=220):
     invoice_list = []
-    # Extract month and year from the date
     month_name, year = date.split(' - ')
     month_number = list(calendar.month_name).index(month_name)
-
-    # Calculate the number of days in the given month
     num_days = calendar.monthrange(int(year), month_number)[1]
 
     for data in customer_data:
         name, milk_data, previous_balance = data.split(':')
         parsed_milk_quantities = parse_milk_data(milk_data)
-
         day_milk_map = {day + 1: qty for day, qty in enumerate(parsed_milk_quantities)}
         total_milk = sum(parsed_milk_quantities)
         total_price = total_milk * milk_price_per_liter
@@ -45,26 +39,19 @@ def create_invoice_data(customer_data, company_name="Yousaf Meo", date="August -
             "date": date,
             "milk_data": milk_data,
             "previous_balance": round(previous_balance, 2),
-            "num_days": num_days  # Pass number of days in the month
+            "num_days": num_days
         }
 
         invoice_list.append(invoice_data)
 
     return invoice_list
 
-
 def create_invoice(invoice_data_list, filename, milk_price_per_liter):
     c = canvas.Canvas(filename, pagesize=A4)
     width, height = A4
-
-    # Set up grid dimensions for the 3x3 matrix
-    rows = 2
-    cols = 3
+    rows, cols = 2, 3
     invoice_width = width / cols
     invoice_height = height / rows
-
-    customer_summaries = []
-    grand_total = 0
 
     for i, invoice_data in enumerate(invoice_data_list):
         col = i % cols
@@ -75,34 +62,32 @@ def create_invoice(invoice_data_list, filename, milk_price_per_liter):
         x_position = col * invoice_width + 20
         y_position = height - (row + 1) * invoice_height + invoice_height - 20
 
-        company_name = invoice_data['company_name']
         client_name = invoice_data['client_name']
         day_milk_map = invoice_data['day_milk_map']
         total_amount = invoice_data['total_amount']
         total_price = invoice_data['total_price']
         previous_balance = invoice_data['previous_balance']
         total_milk = invoice_data['total_milk']
-        milk_data = invoice_data['milk_data']
         date = invoice_data['date']
-        num_days = invoice_data['num_days']  # Get number of days in the month
+        num_days = invoice_data['num_days']
 
         c.setFont("Helvetica-Bold", 10)
-        c.drawString(x_position, y_position, f"{client_name.upper()}")
+        c.drawString(x_position, y_position, f"{client_name.upper()}  /  {date.upper().replace('20', '')}")
+        # c.line(x_position, y_position - 2, x_position + 150, y_position - 2)
 
         c.setFont("Helvetica", 7)
-        c.drawString(x_position, y_position - 12, f"{company_name} / {date}")
+        c.drawString(x_position, y_position - 12, f"{invoice_data['company_name']} - 03012070920")
 
         y_position -= 30
         c.setFont("Helvetica-Bold", 7)
         c.drawString(x_position, y_position, "Day")
         c.drawString(x_position + 50, y_position, "Milk (L)")
         c.drawString(x_position + 100, y_position, "Price (Rs)")
-
         c.line(x_position, y_position - 2, x_position + 150, y_position - 2)
 
         y_position -= 10
         c.setFont("Helvetica", 7)
-        for day in range(1, num_days + 1):  # Dynamically use the correct number of days
+        for day in range(1, num_days + 1):
             milk_qty = day_milk_map.get(day, 0)
             price = milk_qty * milk_price_per_liter
 
@@ -132,47 +117,36 @@ def create_invoice(invoice_data_list, filename, milk_price_per_liter):
         c.drawString(x_position, y_position + 5, "Total Balance")
         c.drawString(x_position + 100, y_position + 5, f"{int(total_amount)}")
 
-        customer_summaries.append((client_name, total_amount, milk_data))
-        grand_total += total_amount
+    c.save()
 
-    c.showPage()
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(30, height - 50, date)
+def create_summary(summary_data, filename, date):
+    c = canvas.Canvas(filename, pagesize=A4)
+    width, height = A4
+    y_position = height - 80
     col_count = 0
+    grand_total = 0
 
-    y_summary_position = height - 80
-    c.setFont("Helvetica", 10)
-    for client_name, total_amount, milk_data in customer_summaries:
-        if y_summary_position < 30:  # Start a new column if near the bottom
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(30, height - 50, f"{date} Report")
+    # c.line(30, height - 55, width - 30, height - 55)
+
+    c.setFont("Helvetica", 12)
+    for client_name, total_amount, milk_data in summary_data:
+        if y_position < 30:
             col_count += 1
-            y_summary_position = height - 80
+            y_position = height - 80
             x_position = (col_count * (width / 2)) + 30
         else:
             x_position = 30 + (col_count * (width / 2))
 
-        c.drawString(x_position, y_summary_position, f"{client_name}: {milk_data} : {int(total_amount)}")
-        y_summary_position -= 20
+        c.drawString(x_position, y_position, f"{client_name}: {milk_data} : {int(total_amount)}")
+        y_position -= 20
+        grand_total += total_amount
 
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(30 + (col_count * (width / 2)), y_summary_position - 100, f"Grand Total: Rs.{int(grand_total)}")
-
+    c.setFont("Helvetica-Bold", 18)
+    c.drawString(30 + (col_count * (width / 2)), y_position - 40, f"Grand Total: Rs.{int(grand_total)}")
     c.save()
 
-
-# Example route to get JSON invoice data
-@app.route('/api/invoice_data', methods=['POST'])
-def get_invoice_data():
-    request_data = request.json
-    customer_data = request_data.get('customer_data', [])
-    company_name = request_data.get('company_name', "Yousaf Meo")
-    date = request_data.get('date', "August - 2024")
-    milk_price_per_liter = request_data.get('milk_price_per_liter', 220)
-
-    invoice_data_list = create_invoice_data(customer_data, company_name, date, milk_price_per_liter)
-    return jsonify(invoice_data_list)
-
-
-# Example route to generate and download PDF invoice
 @app.route('/api/invoice_pdf', methods=['POST'])
 def generate_invoice_pdf():
     request_data = request.json
@@ -190,6 +164,23 @@ def generate_invoice_pdf():
 
     return send_file(filename, as_attachment=True)
 
+@app.route('/api/summary_pdf', methods=['POST'])
+def generate_summary_pdf():
+    request_data = request.json
+    customer_data = request_data.get('customer_data', [])
+    company_name = request_data.get('company_name', "Yousaf Meo")
+    date = request_data.get('date', "August - 2024")
+    milk_price_per_liter = request_data.get('milk_price_per_liter', 220)
+
+    if not customer_data:
+        return jsonify({"error": "Customer data is required"}), 400
+
+    invoice_data_list = create_invoice_data(customer_data, company_name, date, milk_price_per_liter)
+    summary_data = [(data['client_name'], data['total_amount'], data['milk_data']) for data in invoice_data_list]
+    filename = "Customer_summary.pdf"
+    create_summary(summary_data, filename, date)
+
+    return send_file(filename, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='10000', debug=True)
