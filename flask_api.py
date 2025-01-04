@@ -48,7 +48,8 @@ def create_invoice_data(customer_data, company_name="Yousaf Meo", date="August -
             "date": date,
             "milk_data": milk_data,
             "previous_balance": round(previous_balance, 2),
-            "num_days": num_days
+            "num_days": num_days,
+            "milk_price": milk_price_per_liter
         }
 
         invoice_list.append(invoice_data)
@@ -98,7 +99,7 @@ def create_invoice(invoice_data_list, filename, milk_price_per_liter):
         c.setFont("Helvetica", 7)
         for day in range(1, num_days + 1):
             milk_qty = day_milk_map.get(day, 0)
-            price = milk_qty * milk_price_per_liter
+            price = milk_qty * float(invoice_data["milk_price"])
 
             c.drawString(x_position, y_position, str(day))
             c.drawString(x_position + 50, y_position, f"{milk_qty:.2f}")
