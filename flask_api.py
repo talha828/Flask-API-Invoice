@@ -16,11 +16,18 @@ def parse_milk_data(milk_data):
 def create_invoice_data(customer_data, company_name="Yousaf Meo", date="August - 2024", milk_price_per_liter=220):
     invoice_list = []
     month_name, year = date.split(' - ')
+    year = int(year)  # Convert year to an integer for comparison
+
+
     month_number = list(calendar.month_name).index(month_name)
     num_days = calendar.monthrange(int(year), month_number)[1]
 
     for data in customer_data:
-        name, milk_data, previous_balance = data.split(':')
+        if year < 25:
+            name, milk_data, previous_balance = data.split(':')
+        else:
+            name, milk_data, previous_balance ,milk_price_per_liter  = data.split(':')
+
         parsed_milk_quantities = parse_milk_data(milk_data)
         day_milk_map = {day + 1: qty for day, qty in enumerate(parsed_milk_quantities)}
         total_milk = sum(parsed_milk_quantities)
