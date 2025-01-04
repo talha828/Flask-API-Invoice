@@ -86,7 +86,7 @@ def create_invoice(invoice_data_list, filename, milk_price_per_liter):
         # c.line(x_position, y_position - 2, x_position + 150, y_position - 2)
 
         c.setFont("Helvetica", 7)
-        c.drawString(x_position, y_position - 12, f"{invoice_data['company_name']} - 03012070920")
+        c.drawString(x_position, y_position - 12, f"{invoice_data['company_name']}")
 
         y_position -= 30
         c.setFont("Helvetica-Bold", 7)
