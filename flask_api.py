@@ -23,10 +23,12 @@ def create_invoice_data(customer_data, company_name="Yousaf Meo", date="August -
     num_days = calendar.monthrange(int(year), month_number)[1]
 
     for data in customer_data:
+
         if year < 25:
             name, milk_data, previous_balance = data.split(':')
         else:
-            name, milk_data, previous_balance ,milk_price_per_liter  = data.split(':')
+            name, milk_data, previous_balance ,milk_price  = data.split(':')
+            milk_price_per_liter = float(milk_price)
 
         parsed_milk_quantities = parse_milk_data(milk_data)
         day_milk_map = {day + 1: qty for day, qty in enumerate(parsed_milk_quantities)}
